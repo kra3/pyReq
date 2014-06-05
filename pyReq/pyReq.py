@@ -16,25 +16,29 @@ C_PATH_IN          = os.pardir+os.sep+'in'+os.sep    # path where input doc are 
 C_PATH_OUT         = os.pardir+os.sep+'out'+os.sep   # path where ouput doc are (coverage.xlsx can be generated here)
 C_PATH_WORK        = os.pardir+os.sep+"work"+os.sep  # path where json files are
 
+
 class error(BaseException):
-  """ class for Error management for pyReq 
+  """ class for Error management for pyReq
         but also for inheritance classes
   """
   def __init__(self, data):
     self.data = data
 
+
 class reqDict:
-  """ class for requirements management 
+  """ class for requirements management
         Dont use directly this class, but use it via inheritance
   """
   def __init__(self):
     self.reqDict = {}
+
   # key and body are mandatories
   def create(self, key, document, body, coverage = [], attributes = {}):
     if key in self.reqDict:
       raise error("this requirement key is still present %s"%key)
     else:
       self.add(key, document, body, coverage, attributes)
+
   # add a req or modify an existing one
   def add(self, key, document, body, coverage = [], attributes = {}):
     oneReq = {}
@@ -50,17 +54,22 @@ class reqDict:
     self.reqDict[key] = oneReq
     print("add %s"%key)
     print(oneReq)
+
   # get one requirement
   def __getitem__(self, key):
     return self.reqDict[key]
     print("get "+key)
+
   def __delitem__(self, key):
     print("del "+key)
     return self.reqDict.__delitem__(key)
+
   def getKeys(self):
     return self.reqDict.keys()
+
   def __get__(self):
     return self.reqDict
+
   # Check i if the provided list all tags are presents
   # an exception is done is at least one is not found
   def raiseOnNotFoundRequirement(self, listOfReq):
@@ -69,6 +78,7 @@ class reqDict:
       strError = "Not found requirements %s",";".join((set(listOfReq) - set(self.reqDict.keys())))
       print(strError)
       raise error(strError)
+
   # get a list of covered requirements
   def getListOfCoveredReq(self, listOfReq):
     cover={}
@@ -81,6 +91,7 @@ class reqDict:
             cover[oneNeededReq].append(item)
             print(cover)
     return cover
+
   # get a list of requirements from an attribute and its value
   def getListReqFromAttribute(self, attribute, value):
     listOfTags=[]
@@ -101,6 +112,7 @@ class pyReq(reqDict):
         self.reqDict = json.load(fp)
     except IOError:
        pass # no file
+
   def close(self):
     # create a sorted dictionnary for having a sorted Json file
     sortedDict=OrderedDict(sorted(self.reqDict.items(), key=lambda t: t[0]))
@@ -108,10 +120,11 @@ class pyReq(reqDict):
     with open(self.fileName, mode = "w") as fp:
       json.dump(sortedDict, fp, indent=4)
     print("close Json %s"%self.fileName)
+
   def __del__(self):
     self.close()
 
-    
+
 if __name__ == '__main__':
   # 1) Test of reqDict
   print("Test of reqDict")
